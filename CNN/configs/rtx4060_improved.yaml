@@ -1,0 +1,51 @@
+# RTX 4060 改进配置
+# 针对低相关性问题优化
+
+model:
+  name: SpectralResNet1D
+  num_blocks: 12
+  channels: 64
+  input_channels: 1
+
+training:
+  num_epochs: 100
+  batch_size: 32  # 减小批次大小
+  learning_rate: 0.001  # 提高学习率
+  weight_decay: 0.00001
+  optimizer: adam
+  gradient_accumulation_steps: 2  # 减少梯度累积
+  gradient_clip: 1.0
+  mixed_precision: true
+
+loss:
+  type: optimized
+  peak_weight: 5.0  # 降低峰权重
+  compton_weight: 1.0
+  smoothness_weight: 0.05  # 降低平滑度权重
+  frequency_weight: 0.05  # 降低频率权重
+
+data:
+  format: h5
+  train_path: dataset/train
+  val_path: dataset/val
+  num_workers: 0
+  pin_memory: true
+  normalize: true
+  cache_size: 200
+  use_mmap: true
+  prefetch_factor: 2
+
+metrics:
+  use_efficient_metrics: true
+
+logging:
+  log_dir: logs_improved
+  checkpoint_dir: checkpoints_improved
+  save_interval: 10
+  log_interval: 50
+  val_interval: 1
+
+device:
+  use_cuda: true
+  device_id: 0
+  mixed_precision: true

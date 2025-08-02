@@ -1,0 +1,68 @@
+# 默认配置文件
+# 用于单GPU训练和小规模数据
+
+model:
+  name: SpectralResNet1D
+  num_blocks: 12
+  channels: 64
+  input_channels: 1
+
+training:
+  num_epochs: 100
+  batch_size: 16
+  learning_rate: 0.001
+  weight_decay: 0.00001
+  optimizer: adam  # adam, sgd
+  scheduler:
+    type: CosineAnnealingWarmRestarts
+    T_0: 10
+    T_mult: 2
+  gradient_clip_norm: 1.0
+  mixed_precision: false
+
+loss:
+  loss_type: original  # original, optimized, adaptive
+  peak_weight: 10.0
+  compton_weight: 1.0
+  smoothness_weight: 0.1
+  frequency_weight: 0.1  # 仅用于optimized类型
+
+data:
+  format: h5  # h5, lmdb, mmap
+  train_path: dataset/train  # 相对路径，或使用环境变量CNN_DATA_TRAIN_PATH
+  val_path: dataset/val      # 相对路径，或使用环境变量CNN_DATA_VAL_PATH
+  test_path: dataset/test    # 相对路径，或使用环境变量CNN_DATA_TEST_PATH
+  num_workers: 4
+  pin_memory: true
+  normalize: true
+  shuffle: true
+  prefetch_factor: 2
+  persistent_workers: false
+  # 数据加载器优化配置
+  cache_size: 100
+  use_mmap: true
+  use_streaming: false
+  use_large_loader: false
+
+# 指标配置
+metrics:
+  use_efficient_metrics: true  # 使用高效GPU指标系统
+  spectrum_length: 4096
+  moving_average_window: 0.9
+
+logging:
+  log_dir: logs
+  checkpoint_dir: checkpoints
+  save_interval: 5
+  log_interval: 10
+  val_interval: 1
+  tensorboard: true
+
+device:
+  use_cuda: true
+  device_id: 0  # GPU ID，-1表示自动选择
+
+augmentation:
+  enabled: false
+  noise_factor: 0.01
+  shift_range: 10
