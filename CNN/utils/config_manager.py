@@ -243,7 +243,9 @@ class ConfigManager:
                 'learning_rate': 1e-3,
                 'weight_decay': 1e-5,
                 'optimizer': 'adam',
-                'gradient_clip': 1.0
+                'gradient_clip': 1.0,
+                'early_stopping_patience': 10,
+                'early_stopping_min_delta': 0.0
             },
             'data': {
                 'train_path': convert_path_for_config(get_default_data_path('train')),
@@ -307,7 +309,9 @@ def create_default_configs():
             'learning_rate': 1e-3,
             'weight_decay': 1e-5,
             'optimizer': 'adam',
-            'gradient_clip': 1.0
+            'gradient_clip': 1.0,
+            'early_stopping_patience': 10,
+            'early_stopping_min_delta': 0.0
         },
         'data': {
             'train_path': convert_path_for_config(get_default_data_path('train')),

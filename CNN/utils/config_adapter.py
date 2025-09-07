@@ -102,7 +102,9 @@ class ConfigAdapter:
             'learning_rate': 1e-3,
             'weight_decay': 1e-5,
             'gradient_clip': 1.0,
-            'optimizer': 'adam'
+            'optimizer': 'adam',
+            'early_stopping_patience': 10,
+            'early_stopping_min_delta': 0.0
         }
         
         # 从根级别获取

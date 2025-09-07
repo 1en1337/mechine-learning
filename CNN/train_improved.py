@@ -121,6 +121,11 @@ class ImprovedTrainer:
         self.global_step = 0
         self.save_interval = logging_config.get('save_interval', 5)
         self.log_interval = logging_config.get('log_interval', 10)
+
+        # 早停配置 / Early stopping configuration
+        self.early_stopping_patience = training_config.get('early_stopping_patience')
+        self.early_stopping_min_delta = training_config.get('early_stopping_min_delta', 0.0)
+        self.no_improve_epochs = 0
         
         # 指标系统 / Metrics system
         metrics_config = self.config_manager.get('metrics', {})
@@ -393,10 +398,13 @@ class ImprovedTrainer:
             step_scheduler(self.scheduler, epoch, val_loss)
             
             # 检查是否是最佳模型（基于验证损失） / Check if it's the best model (based on validation loss)
-            is_best = val_loss < self.best_val_loss
+            is_best = val_loss < self.best_val_loss - self.early_stopping_min_delta
             if is_best:
                 self.best_val_loss = val_loss
                 self.best_epoch = epoch
+                self.no_improve_epochs = 0
+            else:
+                self.no_improve_epochs += 1
             
             # 打印epoch总结 / Print epoch summary
             print(f"\nEpoch {epoch} Summary:")
@@ -407,6 +415,12 @@ class ImprovedTrainer:
             # 保存检查点 / Save checkpoint
             if (epoch + 1) % self.save_interval == 0 or is_best:
                 self.save_checkpoint(epoch, val_loss, is_best)
+
+            # 早停检查 / Early stopping check
+            if (self.early_stopping_patience is not None and
+                    self.no_improve_epochs >= self.early_stopping_patience):
+                print(f"Early stopping triggered at epoch {epoch}")
+                break
         
         # 训练结束 / Training complete
         print("\n" + "=" * 50)

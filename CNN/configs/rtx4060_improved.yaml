@@ -15,6 +15,8 @@ training:
   optimizer: adam
   gradient_accumulation_steps: 2  # 减少梯度累积
   gradient_clip: 1.0
+  early_stopping_patience: 10
+  early_stopping_min_delta: 0.0
   mixed_precision: true
 
 loss:
